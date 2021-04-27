@@ -54,4 +54,17 @@ public class PaxosStateService {
             //TODO return Reject
         }
     }
+
+    public void enableFault(Integer faultType) {
+        //TODO ENABLE FAULT
+        if (faultType == 1) {
+
+        } else if (faultType == 2) {
+
+        }
+    }
+
+    public void disableFault() {
+        //TODO DISABLE FAULT
+    }
 }
