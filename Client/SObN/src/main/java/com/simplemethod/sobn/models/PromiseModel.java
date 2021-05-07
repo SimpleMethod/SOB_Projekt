@@ -27,4 +27,8 @@ public class PromiseModel {
     public PromiseModel(String proposerValue) {
         this.proposerValue = proposerValue;
     }
+
+    public PromiseModel() {
+        super();
+    }
 }
