@@ -15,7 +15,8 @@ import java.math.BigInteger;
         "acceptorID",
         "sequenceNumber",
         "proposerValue",
-        "acceptorState"
+        "acceptorState",
+        "faultType"
 })
 @Resource
 @Getter
@@ -27,7 +28,7 @@ public class AcceptorModel {
     private BigInteger sequenceNumber= BigInteger.valueOf(0);
     private String proposerValue;
     private boolean failureAcceptor=false;
-
+    private BigInteger faultType;
     public AcceptorModel(BigInteger acceptorID, String proposerValue) {
         this.acceptorID = acceptorID;
         this.proposerValue = proposerValue;
