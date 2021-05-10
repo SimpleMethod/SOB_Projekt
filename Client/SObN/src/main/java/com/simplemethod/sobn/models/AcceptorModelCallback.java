@@ -39,4 +39,3 @@ public class AcceptorModelCallback {
         super();
     }
 }
->>>>>>> master
