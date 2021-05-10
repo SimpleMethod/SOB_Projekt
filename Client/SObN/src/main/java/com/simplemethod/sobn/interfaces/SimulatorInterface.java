@@ -1,6 +1,5 @@
 package com.simplemethod.sobn.interfaces;
 
-import com.simplemethod.sobn.enums.FaultsEnum;
 import com.simplemethod.sobn.models.AcceptorModel;
 import com.simplemethod.sobn.models.PromiseModel;
 import io.swagger.annotations.ApiOperation;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.math.BigInteger;
+import java.net.ConnectException;
 
 public interface SimulatorInterface {
 
@@ -22,7 +22,7 @@ public interface SimulatorInterface {
     })
     @GetMapping(value = "acceptor/{acceptorID}", produces = "application/json")
     @ResponseBody
-    ResponseEntity<AcceptorModel> getAcceptorInfo(@Valid @NotEmpty @PathVariable BigInteger acceptorID);
+    ResponseEntity<AcceptorModel> getAcceptorInfo(@Valid @NotEmpty @PathVariable BigInteger acceptorID) throws ConnectException;
 
     @ApiOperation(value = "Send new seq number and value to proposer")
     @ApiResponses(value = {

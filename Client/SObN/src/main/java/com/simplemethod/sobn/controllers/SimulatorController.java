@@ -1,45 +1,56 @@
 package com.simplemethod.sobn.controllers;
 
-import com.simplemethod.sobn.enums.FaultsEnum;
 import com.simplemethod.sobn.interfaces.SimulatorInterface;
 import com.simplemethod.sobn.models.AcceptorModel;
+import com.simplemethod.sobn.models.AcceptorModelCallback;
 import com.simplemethod.sobn.models.PromiseModel;
+import com.simplemethod.sobn.services.ProposerService;
+import com.simplemethod.sobn.services.SimulatorService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.math.BigInteger;
 
 @RestController
 public class SimulatorController implements SimulatorInterface {
 
+    @Autowired
+    SimulatorService simulatorService;
+
+    @Autowired
+    ProposerService proposerService;
+
     @Override
     public ResponseEntity<AcceptorModel> getAcceptorInfo(BigInteger acceptorID) {
-
-       final short failure= (short) Math.round(Math.random());
-       boolean acceptorState=false;
-        if(failure==1)
-        {
-            acceptorState=true;
-        }
-        AcceptorModel acceptorModel = new AcceptorModel(acceptorID,acceptorID.add(BigInteger.valueOf(1)),"temp",acceptorState);
-        return new ResponseEntity<>(acceptorModel, HttpStatus.OK);
+        AcceptorModelCallback acceptorModel = simulatorService.getAcceptorInfo(acceptorID);
+        AcceptorModel acceptorModel1 = new AcceptorModel(acceptorModel.getAcceptorID(),acceptorModel.getSequenceNumber(),acceptorModel.getProposerValue(),acceptorModel.isFailureAcceptor(),acceptorModel.getFaultType());
+        return new ResponseEntity<>(acceptorModel1, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<Object> updateProposerValue(PromiseModel promiseModel) {
-        //TODO: Odebranie wiadomości od frontu i przesłanie jej dalej
+        proposerService.makePaxosCommunication(promiseModel.getProposerValue());
         return null;
     }
 
     @Override
     public ResponseEntity<Object> acceptorFault(BigInteger acceptorID, short typeFault) {
-        //TODO: Odebranie wiadomości od frontu i przesłanie jej dalej
-        return null;
+        boolean requestStatus = simulatorService.updateFatalError(acceptorID, typeFault);
+        if (requestStatus) {
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
     @Override
     public ResponseEntity<Object> repairAcceptor(BigInteger acceptorID) {
-        //TODO: Odebranie wiadomości od frontu i przesłanie jej dalej
-        return null;
+        boolean requestStatus = simulatorService.removeFatalError(acceptorID);
+        if (requestStatus) {
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
+
 }
