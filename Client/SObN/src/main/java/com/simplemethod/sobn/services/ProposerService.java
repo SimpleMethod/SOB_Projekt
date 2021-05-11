@@ -2,6 +2,7 @@ package com.simplemethod.sobn.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.simplemethod.sobn.controllers.MockController;
 import com.simplemethod.sobn.models.PromiseModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -36,6 +37,7 @@ public class ProposerService {
         System.out.println("Numer sekwencyjny:"+seqNumber);
         response.forEach((k,v) -> System.out.println("Acceptor: "+k+" Wartość:"+v));
         return response;
+
     }
 
     public boolean preparePromisePhase(BigInteger AcceptorID, BigInteger seqNumber, String value) {

@@ -2,6 +2,7 @@ package com.simplemethod.sobn.interfaces;
 
 import com.simplemethod.sobn.models.AcceptorModel;
 import com.simplemethod.sobn.models.PromiseModel;
+import com.simplemethod.sobn.models.VotingModel;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -12,6 +13,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.math.BigInteger;
 import java.net.ConnectException;
+import java.util.List;
 
 public interface SimulatorInterface {
 
@@ -48,4 +50,21 @@ public interface SimulatorInterface {
     })
     @DeleteMapping(value = "acceptor/{acceptorID}")
     ResponseEntity<Object> repairAcceptor(@Valid @NotEmpty @PathVariable BigInteger acceptorID);
+
+
+    @ApiOperation(value = "Make votting")
+    @ApiResponses(value = {
+            @ApiResponse(code = 202, message = "Accepted"),
+            @ApiResponse(code = 400, message = "Bad Request"),
+    })
+    @PostMapping(value = "acceptor/{acceptorID}/voting")
+    ResponseEntity<Object> makeVoting(@Valid @NotEmpty @PathVariable  BigInteger acceptorID);
+
+    @ApiOperation(value = "Show history of voting")
+    @ApiResponses(value = {
+            @ApiResponse(code = 202, message = "Accepted"),
+            @ApiResponse(code = 400, message = "Bad Request"),
+    })
+    @GetMapping(value = "acceptor/history")
+    ResponseEntity<List<VotingModel>> showHistory();
 }

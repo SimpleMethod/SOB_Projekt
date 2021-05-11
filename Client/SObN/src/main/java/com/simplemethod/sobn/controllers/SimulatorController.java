@@ -4,6 +4,7 @@ import com.simplemethod.sobn.interfaces.SimulatorInterface;
 import com.simplemethod.sobn.models.AcceptorModel;
 import com.simplemethod.sobn.models.AcceptorModelCallback;
 import com.simplemethod.sobn.models.PromiseModel;
+import com.simplemethod.sobn.models.VotingModel;
 import com.simplemethod.sobn.services.ProposerService;
 import com.simplemethod.sobn.services.SimulatorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigInteger;
+import java.util.List;
 
 @RestController
 public class SimulatorController implements SimulatorInterface {
@@ -24,14 +26,18 @@ public class SimulatorController implements SimulatorInterface {
 
     @Override
     public ResponseEntity<AcceptorModel> getAcceptorInfo(BigInteger acceptorID) {
+       /*
         AcceptorModelCallback acceptorModel = simulatorService.getAcceptorInfo(acceptorID);
         AcceptorModel acceptorModel1 = new AcceptorModel(acceptorModel.getAcceptorID(),acceptorModel.getSequenceNumber(),acceptorModel.getProposerValue(),acceptorModel.isFailureAcceptor(),acceptorModel.getFaultType());
         return new ResponseEntity<>(acceptorModel1, HttpStatus.OK);
+        */
+        return new ResponseEntity<>(simulatorService.getAcceptorInfo(acceptorID),HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<Object> updateProposerValue(PromiseModel promiseModel) {
-        proposerService.makePaxosCommunication(promiseModel.getProposerValue());
+       // proposerService.makePaxosCommunication(promiseModel.getProposerValue());
+        simulatorService.updateValue(promiseModel.getProposerValue());
         return null;
     }
 
@@ -52,5 +58,20 @@ public class SimulatorController implements SimulatorInterface {
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
+
+    @Override
+    public ResponseEntity<Object> makeVoting(BigInteger acceptorID) {
+      //  boolean requestStatus = simulatorService.updateValue(acceptorID);
+    //    if (requestStatus) {
+    //        return new ResponseEntity<>(null, HttpStatus.OK);
+    //    }
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    }
+
+    @Override
+    public ResponseEntity<List<VotingModel>> showHistory() {
+        return  new ResponseEntity<>(simulatorService.getsVotingModels(),HttpStatus.OK);
+    }
+
 
 }

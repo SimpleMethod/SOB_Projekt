@@ -74,6 +74,7 @@
                 <th scope="col">Typ awarii</th>
                 <th scope="col">Ostatni numer sekwencyjny</th>
                 <th scope="col">Ostatnia wartość</th>
+                <th scope="col">Wartość głosowania</th>
                 <th scope="col">Operacja awarii</th>
             </tr>
             </thead>
@@ -101,6 +102,7 @@
                 </td>
                 <td>{{dataAcceptor_1.sequenceNumber}}</td>
                 <td>{{dataAcceptor_1.proposerValue}}</td>
+                <td>{{dataAcceptor_1.votingValue}}</td>
                 <td><select class="form-control" v-model="failureAcceptor_1" placeholder="Rodzaj błedu">
                     <option value="0">Awaria połączenia</option>
                     <option value="1">Szalony acceptor</option>
@@ -135,6 +137,7 @@
                 </td>
                 <td>{{dataAcceptor_2.sequenceNumber}}</td>
                 <td>{{dataAcceptor_2.proposerValue}}</td>
+                <td>{{dataAcceptor_2.votingValue}}</td>
                 <td><select class="form-control" v-model="failureAcceptor_2" placeholder="Rodzaj błedu">
                     <option value="0">Awaria połączenia</option>
                     <option value="1">Szalony acceptor</option>
@@ -169,6 +172,7 @@
                 </td>
                 <td>{{dataAcceptor_3.sequenceNumber}}</td>
                 <td>{{dataAcceptor_3.proposerValue}}</td>
+                <td>{{dataAcceptor_3.votingValue}}</td>
                 <td><select class="form-control" v-model="failureAcceptor_3" placeholder="Rodzaj błedu">
                     <option value="0">Awaria połączenia</option>
                     <option value="1">Szalony acceptor</option>
@@ -184,11 +188,29 @@
         </table>
     </div>
 
+
+    <div class="container">
+        <div class="row">
+            <div class="col"><h3>Przeprowadzenie głosowania:</h3><br>
+                <div id="addNewValueToProposer">
+                    <p>Aktualne głosowanie: {{newValueToProposer}}</p>
+                    <div class="col-sm-4 themed-grid-col">
+                        <input type="text" class="form-control" v-model="newValueToProposer"
+                               placeholder="nowa wartość">
+                        <hr>
+                        <button @click="updateValue" type="button" class="btn btn-primary">Rozpocznij proces głosowania
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!--
     <div class="container">
         <div class="row">
             <div class="col"><h3>Wysłanie nowej wartości do proposer</h3><br>
                 <div id="addNewValueToProposer">
-                    <!-- Todo: Dodanie seq numbers-->
+
                     <div class="col-sm-4 themed-grid-col">
                         <input type="text" class="form-control" v-model="newValueToProposer"
                                placeholder="nowa wartość">
@@ -200,7 +222,27 @@
             </div>
         </div>
     </div>
+-->
 
+    <br><br><h3>Historia głosowań:</h3><hr>
+    <div id="getHistoryVoting">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Identyfikator akceptora</th>
+                <th scope="col">Rodzaj głosowania</th>
+                <th scope="col">Wartośc głosowania akceptora</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="item in historyVoting">
+                <td>{{item.acceptorID}}</td>
+                <td>{{item.votingValue}}</td>
+                <td>{{item.acceptorResponse}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </main>
 
 <footer class="footer">
@@ -322,6 +364,34 @@
                     },
                 })
             }
+        }
+    })
+
+
+    new Vue({
+        el: '#getHistoryVoting',
+        data:
+            {
+                historyVoting: "",
+            },
+        methods: {
+            loadData() {
+                if (this.responseStatus === true) {
+                    axios({
+                        method: 'get',
+                        url: 'http://localhost:2110/acceptor/history',
+                    }).then(response => (
+                            this.historyVoting = response.data
+                        )
+                    )
+                }
+            }
+        },
+        mounted() {
+            this.responseStatus = true;
+            this.polling = setInterval(() => {
+                this.loadData();
+            }, 1000)
         }
     })
 </script>
