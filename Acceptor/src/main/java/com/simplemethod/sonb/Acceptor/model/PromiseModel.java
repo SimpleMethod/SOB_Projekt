@@ -13,5 +13,6 @@ import java.math.BigInteger;
 @AllArgsConstructor
 public class PromiseModel {
     private BigInteger sequenceNumber = BigInteger.ZERO;
+    //wartość z akceptora
     private String proposerValue;
 }

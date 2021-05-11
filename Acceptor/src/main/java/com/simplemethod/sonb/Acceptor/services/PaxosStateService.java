@@ -3,9 +3,12 @@ package com.simplemethod.sonb.Acceptor.services;
 import com.simplemethod.sonb.Acceptor.model.StateDto;
 import com.simplemethod.sonb.Acceptor.model.Vote;
 import com.simplemethod.sonb.Acceptor.model.VotingContext;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,12 +21,19 @@ public class PaxosStateService {
 
     private List<VotingContext> votingSessions = new ArrayList<>();
 
+    @Getter
+    private BigInteger sequenceNumber = BigInteger.ONE;
+
+    @Setter
+    private Integer currentFault;
+
     public VotingContext getCurrentVotingSession() {
         return votingSessions.isEmpty() ? null : votingSessions.get(votingSessions.size() - 1);
     }
 
     public void startNewVotingSession(String newProblem) {
         VotingContext votingContext = new VotingContext();
+        votingContext.setCurrentProblem(newProblem);
         votingSessions.add(votingContext);
         syncService.syncAcceptors(votingSessions);
     }
@@ -42,7 +52,7 @@ public class PaxosStateService {
         return new StateDto(votes, problem, nextSequenceNumber);
     }
 
-    public void tryToAddVote(int sequenceId, String message) {
+    public boolean tryToAddVote(BigInteger sequenceId, String message) {
         VotingContext cvs = getCurrentVotingSession();
 
         if (syncService.checkIsNextSequenceIdValid(cvs, sequenceId)) {
@@ -50,21 +60,15 @@ public class PaxosStateService {
             syncService.syncAcceptors(votingSessions);
 
             //TODO return Accept
+            return true;
         } else {
             //TODO return Reject
+            return false;
         }
+
     }
 
-    public void enableFault(Integer faultType) {
-        //TODO ENABLE FAULT
-        if (faultType == 1) {
-
-        } else if (faultType == 2) {
-
-        }
-    }
-
-    public void disableFault() {
-        //TODO DISABLE FAULT
+    public long getAcceptorId() {
+        return 0;
     }
 }

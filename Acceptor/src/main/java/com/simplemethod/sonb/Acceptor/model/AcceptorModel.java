@@ -7,9 +7,11 @@ import java.math.BigInteger;
 
 @Getter
 @AllArgsConstructor
+//stan akceptora
 public class AcceptorModel {
     private BigInteger acceptorID;
     private BigInteger sequenceNumber = BigInteger.ZERO;
     private String proposerValue;
     private boolean failureAcceptor = false;
+    private BigInteger failureType;
 }
