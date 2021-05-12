@@ -61,7 +61,8 @@ public class AcceptorAPI {
                 BigInteger.valueOf(state.getAcceptorId()),
                 state.getSequenceNumber(),
                 "Enabled fault of type: " + faultType,
-                true
+                true,
+                null
         );
     }
 
@@ -73,7 +74,8 @@ public class AcceptorAPI {
                 BigInteger.valueOf(state.getAcceptorId()),
                 state.getSequenceNumber(),
                 "Disabled Fault",
-                false
+                false,
+                null
         );
     }
 
