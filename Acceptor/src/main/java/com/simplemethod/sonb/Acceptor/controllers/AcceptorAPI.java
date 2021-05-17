@@ -1,95 +1,74 @@
 package com.simplemethod.sonb.Acceptor.controllers;
 
 
-import com.simplemethod.sonb.Acceptor.model.AcceptorModel;
-import com.simplemethod.sonb.Acceptor.model.PromiseModel;
-import com.simplemethod.sonb.Acceptor.model.StateDto;
-import com.simplemethod.sonb.Acceptor.services.PaxosStateService;
+import com.simplemethod.sonb.Acceptor.model.AcceptedNotificationModel;
+import com.simplemethod.sonb.Acceptor.model.AcceptorResponseModel;
+import com.simplemethod.sonb.Acceptor.model.ProposeRequestModel;
+import com.simplemethod.sonb.Acceptor.services.AcceptorPaxosLogicService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
-import java.math.BigInteger;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/acceptor")
+@RequestMapping("/acceptor/{acceptorId}")
 @RequiredArgsConstructor
 public class AcceptorAPI {
 
-    private final PaxosStateService state;
+    private final AcceptorPaxosLogicService acceptorLogic;
 
-    //TODO Uncomment when/if we decide how to handle acceptor's logic
-//    @PostMapping("/sync")
-//    public void sync() {
-//        //TODO Sync acceptors
-//    }
-//
-    @GetMapping("/start-new-session")
-    public void startNewSession(@RequestParam String newProblem) {
-        state.startNewVotingSession(newProblem);
-    }
-//
-//    @GetMapping("/state")
-//    public StateDto getState() {
-//        return state.getStateDto();
-//    }
-//
-//    @PostMapping("/propose")
-//    public void propose(@RequestParam int sequenceId, @RequestParam String message) {
-//        state.tryToAddVote(sequenceId, message);
-//    }
+    @PostMapping("/add-new-problem")
+    public AcceptorResponseModel addNewProblem(@PathVariable Integer acceptorId, @RequestBody ProposeRequestModel propose) {
+        if (acceptorLogic.isSequenceCorrect(acceptorId, propose)) {
+            acceptorLogic.addToStaging(acceptorId, propose.getMessage());
+            return responseSimpleAccepted();
+        }
 
-
-    @GetMapping("/{acceptorId}")
-    public StateDto getAcceptorById(@PathVariable Integer acceptorId) {
-//        //TODO Remove mock
-//        return new AcceptorModel(
-//                BigInteger.ONE,
-//                BigInteger.TEN,
-//                "Mocked proposer value",
-//                false
-//        );
-
-
-        return state.getStateDto();
+        return responseSimpleReject();
     }
 
-    @PutMapping("/{acceptorId}/fault/{faultType}")
-    public AcceptorModel putAcceptorFault(@PathVariable Integer acceptorId, @PathVariable Integer faultType) {
-        state.setCurrentFault(faultType);
-        //TODO po to jest acceptorId
-        return new AcceptorModel(
-                BigInteger.valueOf(state.getAcceptorId()),
-                state.getSequenceNumber(),
-                "Enabled fault of type: " + faultType,
-                true,
-                null
-        );
+    @PostMapping("/accepted-new-problem")
+    public void acceptedNewProblem(@PathVariable Integer acceptorId, @RequestBody AcceptedNotificationModel accepted) {
+        acceptorLogic.acceptNewVotingSession(acceptorId, accepted);
     }
 
-    @DeleteMapping("/{acceptorId}/fault")
-    public AcceptorModel deleteAcceptorFault() {
-        state.setCurrentFault(null);
+    @PostMapping("/add-new-vote")
+    public AcceptorResponseModel addNewVote(@PathVariable Integer acceptorId, @RequestBody ProposeRequestModel propose) {
+        if (acceptorLogic.isSequenceCorrect(acceptorId, propose)) {
+            acceptorLogic.addToStaging(acceptorId, propose.getMessage());
+            return responseSimpleAccepted();
+        }
 
-        return new AcceptorModel(
-                BigInteger.valueOf(state.getAcceptorId()),
-                state.getSequenceNumber(),
-                "Disabled Fault",
-                false,
-                null
-        );
+        return responseSimpleReject();
     }
 
-    @GetMapping("/{acceptorId}/prepare")
-//    @PostMapping("/{acceptorId}/prepare")
-//    public PromiseModel postPrepare(@RequestBody PromiseModel model) {
-    public PromiseModel postPrepare( @RequestParam BigInteger sequenceNumber, @RequestParam String proposerValue) {
+    @PostMapping("/accepted-new-vote")
+    public void acceptedNewVote(@PathVariable Integer acceptorId, @RequestBody AcceptedNotificationModel accepted) {
+        acceptorLogic.acceptNewVote(acceptorId, accepted);
+    }
 
-        boolean succes = state.tryToAddVote(sequenceNumber, proposerValue);
-        //co zwracać?
-        return new PromiseModel(
-                state.getSequenceNumber(),
-                succes ? "Succes" : "Failure"
-        );
+    @PostMapping("/enable-error")
+    public void enableError(@PathVariable Integer acceptorId, @RequestBody ProposeRequestModel propose) {
+        acceptorLogic.enableError(acceptorId, propose);
+    }
 
+    @PostMapping("/disable-error")
+    public void disableError(@PathVariable Integer acceptorId) {
+        acceptorLogic.disableError(acceptorId);
+    }
+
+    @PostMapping("/fetch-acceptor-state")
+    public AcceptorResponseModel fetchState(@PathVariable Integer acceptorId) {
+        return acceptorLogic.getStateDto(acceptorId);
+    }
+
+    private AcceptorResponseModel responseSimpleAccepted() {
+        return new AcceptorResponseModel(true, null, null);
+    }
+
+    private AcceptorResponseModel responseSimpleReject() {
+        return new AcceptorResponseModel(false, null, null);
     }
 }
