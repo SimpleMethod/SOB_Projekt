@@ -1,63 +1,123 @@
 package com.simplemethod.sobn_v2.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.simplemethod.sobn.models.PromiseModel;
 import com.simplemethod.sobn_v2.model.AcceptedRequestModel;
 import com.simplemethod.sobn_v2.model.AcceptorResponseModel;
 import com.simplemethod.sobn_v2.model.ProposeRequestModel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
 
+@Controller
 public class CommunicationService {
+
+    @Bean
+    public RestTemplate restTemplate() {
+        final HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(2000);
+        requestFactory.setReadTimeout(2000);
+        return new RestTemplate(requestFactory);
+    }
+
+    @Autowired
+    RestTemplate restTemplate = new RestTemplate();
+
+    private final ObjectMapper objectMapper = new ObjectMapper();;
+    private final HttpHeaders headers = new HttpHeaders();
 
     @Getter
     @AllArgsConstructor
     public enum AcceptorApi { //INFO: All urls given here, hits on endpoints in Acceptor application, class: AcceptorAPI
-        ADD_NEW_PROBLEM("localhost:2120/acceptor/:acceptorId/add-new-problem",
-                "localhost:2120/acceptor/:acceptorId/accepted-new-problem"),
-
-        ADD_NEW_VOTE("localhost:2120/acceptor/:acceptorId/add-new-vote",
-                "localhost:2120/acceptor/:acceptorId/accepted-new-vote"),
-
-        ENABLE_ERROR("localhost:2120/acceptor/:acceptorId/enable-error", null),
-
-        DISABLE_ERROR("localhost:2120/acceptor/:acceptorId/disable-error", null),
-
-        FETCH_ACCEPTOR_STATE("localhost:2120/acceptor/:acceptorId/fetch-acceptor-state", null);
+        ADD_NEW_PROBLEM("http://localhost:2120/acceptor/:acceptorId/add-new-problem","http://localhost:2120/acceptor/:acceptorId/accepted-new-problem"),
+        ADD_NEW_VOTE("http://localhost:2120/acceptor/:acceptorId/add-new-vote",
+                "http://localhost:2120/acceptor/:acceptorId/accepted-new-vote"),
+        ENABLE_ERROR("http://localhost:2120/acceptor/:acceptorId/enable-error", null),
+        DISABLE_ERROR("http://localhost:2120/acceptor/:acceptorId/disable-error", null),
+        FETCH_ACCEPTOR_STATE("http://localhost:2120/acceptor/:acceptorId/fetch-acceptor-state", null);
 
         private String proposeUrl;
 
         private String acceptedUrl;
     }
 
-    public boolean sendProposeAndAwaitResponse(String effectiveUrl, ProposeRequestModel proposeRequestModel) {
+    public boolean sendProposeAndAwaitResponse(String effectiveUrl, ProposeRequestModel proposeRequestModel){
         //TODO KP&MaMr send proposeRequestModel to given effectiveUrl and await response
         //Should return true if acceptor responded with true
         //Should return false if acceptor responded with false
+
+        try {
+
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(proposeRequestModel), headers);
+            String resultAsJsonStr = restTemplate.postForObject(effectiveUrl, request, String.class);
+             AcceptorResponseModel acceptorResponseModel = objectMapper.readValue(resultAsJsonStr, AcceptorResponseModel.class);
+             return acceptorResponseModel.getRequestAccepted();
+        } catch (JsonProcessingException ignored)
+        {
+
+        }
 
         return false;
     }
 
     public void sendAccepted(String effectiveUrl, AcceptedRequestModel acceptedRequestModel) {
+        try {
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(acceptedRequestModel), headers);
+            restTemplate.postForObject(effectiveUrl, request, String.class);
+        }
+        catch (HttpClientErrorException | JsonProcessingException ignored)
+        {
+        }
         //TODO KP&MaMr Send acceptedRequestModel at given effectiveUrl. No need of any additional operations or handling response
     }
 
 
-    public void sendEnableErrorRequest(Integer acceptorId, Integer errorType) {
+    public void sendEnableErrorRequest(Integer acceptorId, Integer errorType)  {
         String effectiveUrl = processToEffectiveUrl(AcceptorApi.ENABLE_ERROR.getProposeUrl(), acceptorId);
-        ProposeRequestModel proposeRequestModel = new ProposeRequestModel(String.valueOf(errorType), null);
 
+        try {
+            ProposeRequestModel proposeRequestModel = new ProposeRequestModel(String.valueOf(errorType), null);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(proposeRequestModel), headers);
+            restTemplate.postForObject(effectiveUrl, request, String.class);
+        }
+        catch (HttpClientErrorException | JsonProcessingException ignored)
+        {
+        }
         //TODO KP&MaMr Send proposeRequestModel at given effectiveUrl. No need of any additional operations or handling response
     }
 
     public void sendDisableErrorRequest(Integer acceptorId) {
         String effectiveUrl = processToEffectiveUrl(AcceptorApi.DISABLE_ERROR.getProposeUrl(), acceptorId);
+        try {
+            restTemplate.postForObject(effectiveUrl, null, String.class);
+        }
+        catch (HttpClientErrorException ignored)
+        {
 
+        }
         //TODO KP&MaMr Send simple request at given effectiveUrl. No need of any additional operations or handling response
     }
 
     public AcceptorResponseModel readStateOfAcceptor(int acceptorId) {
         String effectiveUrl = processToEffectiveUrl(AcceptorApi.FETCH_ACCEPTOR_STATE.getProposeUrl(), acceptorId);
-
-        //TODO KP&MaMr read data
+        try {
+            return restTemplate.getForObject(effectiveUrl, AcceptorResponseModel.class);
+        } catch (ResourceAccessException ignored) {
+        }
         return null;
     }
 

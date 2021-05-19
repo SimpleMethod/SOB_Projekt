@@ -6,11 +6,7 @@ import com.simplemethod.sonb.Acceptor.model.AcceptorResponseModel;
 import com.simplemethod.sonb.Acceptor.model.ProposeRequestModel;
 import com.simplemethod.sonb.Acceptor.services.AcceptorPaxosLogicService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/acceptor/{acceptorId}")
@@ -59,16 +55,16 @@ public class AcceptorAPI {
         acceptorLogic.disableError(acceptorId);
     }
 
-    @PostMapping("/fetch-acceptor-state")
+    @GetMapping("/fetch-acceptor-state")
     public AcceptorResponseModel fetchState(@PathVariable Integer acceptorId) {
         return acceptorLogic.getStateDto(acceptorId);
     }
 
     private AcceptorResponseModel responseSimpleAccepted() {
-        return new AcceptorResponseModel(true, null, null);
+        return new AcceptorResponseModel(true, null, null,null,null);
     }
 
     private AcceptorResponseModel responseSimpleReject() {
-        return new AcceptorResponseModel(false, null, null);
+        return new AcceptorResponseModel(false, null, null,null,null);
     }
 }

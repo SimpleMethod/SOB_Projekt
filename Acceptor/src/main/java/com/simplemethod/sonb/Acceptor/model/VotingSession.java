@@ -13,7 +13,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class VotingSession {
     private String currentProblem;
     private final List<String> votes = new ArrayList<>();

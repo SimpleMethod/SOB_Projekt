@@ -12,14 +12,17 @@ import java.util.List;
 @AllArgsConstructor
 public class AcceptorModel {
 
-    private Integer currentError;
+    private Integer currentError=0;
     private Integer currentSequenceNumber = 1;
     private List<VotingSession> votingSessions = new ArrayList<>();
 
-    private String stagingArea;
+    private String stagingArea="";
 
     public VotingSession getCurrentVotingSession() {
         return votingSessions.isEmpty() ? null : votingSessions.get(votingSessions.size() - 1);
     }
 
+    public AcceptorModel() {
+        super();
+    }
 }

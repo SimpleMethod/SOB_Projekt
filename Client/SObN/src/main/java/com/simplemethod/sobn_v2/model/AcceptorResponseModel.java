@@ -12,11 +12,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AcceptorResponseModel {
-
     private Boolean requestAccepted;
-
     private String currentProblem;
-
     private List<String> currentProblemVotes;
-
+    private Integer currentSequenceNumber;
+    private Integer currentFault;
 }

@@ -8,14 +8,19 @@ import com.simplemethod.sonb.Acceptor.model.VotingSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class AcceptorPaxosLogicService {
 
     private final AcceptorAppState acceptorAppState;
-
+    private  BigInteger prevSeqNumber=BigInteger.valueOf(0);
     public AcceptorResponseModel getStateDto(Integer acceptorId) {
         AcceptorModel acceptor = acceptorAppState.getAcceptor(acceptorId);
+
+        //TODO: Store the previous sequence number and return it during a fault. //MM
         if (acceptor.getCurrentError() == 1) {
             //TODO KP&MaMr handle error of type 1
         } else if (acceptor.getCurrentError() == 2) {
@@ -23,22 +28,33 @@ public class AcceptorPaxosLogicService {
         }
 
         VotingSession currentVotingSession = acceptorAppState.getCurrentVotingSession(acceptorId);
-
+        if (acceptor.getCurrentError()!=0 || Objects.isNull(currentVotingSession)) {
+            return new AcceptorResponseModel(
+                    true,
+                    null,
+                    null,
+                    prevSeqNumber.intValue(),
+                    acceptor.getCurrentError()
+            );
+        }
         return new AcceptorResponseModel(
                 true,
                 currentVotingSession.getCurrentProblem(),
-                currentVotingSession.getVotes()
+                currentVotingSession.getVotes(),
+                acceptor.getCurrentSequenceNumber(),
+                acceptor.getCurrentError()
         );
     }
 
     public boolean isSequenceCorrect(Integer acceptorId, ProposeRequestModel requestModel) {
+        prevSeqNumber=BigInteger.valueOf(acceptorAppState.getAcceptor(acceptorId).getCurrentSequenceNumber());
         return acceptorAppState.getAcceptor(acceptorId).getCurrentSequenceNumber() == requestModel.getSequenceNumber();
     }
 
     public void acceptNewVotingSession(Integer acceptorId, AcceptedNotificationModel accepted) {
         AcceptorModel acceptor = acceptorAppState.getAcceptor(acceptorId);
 
-        checkAcceptError(accepted, acceptor);
+        //checkAcceptError(accepted, acceptor); //TODO: Verify that the error checking is working correctly //MM
 
         acceptor.getVotingSessions().add(new VotingSession(accepted.getAcceptedValue()));
 
@@ -48,7 +64,7 @@ public class AcceptorPaxosLogicService {
     public void acceptNewVote(Integer acceptorId, AcceptedNotificationModel accepted) {
         AcceptorModel acceptor = acceptorAppState.getAcceptor(acceptorId);
 
-        checkAcceptError(accepted, acceptor);
+        //checkAcceptError(accepted, acceptor);
 
         acceptor.getCurrentVotingSession().getVotes().add(accepted.getAcceptedValue());
 
@@ -68,7 +84,7 @@ public class AcceptorPaxosLogicService {
 
     public void disableError(Integer acceptorId) {
         AcceptorModel acceptor = acceptorAppState.getAcceptor(acceptorId);
-        acceptor.setCurrentError(null);
+        acceptor.setCurrentError(0);
     }
 
     public void addToStaging(Integer acceptorId, String message) {

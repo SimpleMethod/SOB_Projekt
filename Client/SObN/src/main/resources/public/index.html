@@ -58,7 +58,7 @@
 <header>
     <!-- Fixed navbar -->
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-        <a class="navbar-brand" href="#">Paxos: głosowanie</a>
+        <a class="navbar-brand" href="#">Paxos: głosowanie [Administrator]</a>
     </nav>
 </header>
 
@@ -73,7 +73,7 @@
                 <th scope="col">Status działania</th>
                 <th scope="col">Typ awarii</th>
                 <th scope="col">Ostatni numer sekwencyjny</th>
-                <th scope="col">Ostatnia wartość</th>
+                <th scope="col">Głosowanie</th>
                 <th scope="col">Wartość głosowania</th>
                 <th scope="col">Operacja awarii</th>
             </tr>
@@ -82,7 +82,7 @@
             <tr>
                 <th scope="row">1</th>
                 <td>
-                    <div v-if="dataAcceptor_1.failureAcceptor === true">
+                    <div v-if="dataAcceptor[0].currentFault === 0">
                         <h2>✔️</h2>
                     </div>
                     <div v-else>
@@ -90,22 +90,22 @@
                     </div>
                 </td>
                 <td>
-                    <div v-if="dataAcceptor_1.faultType === 0 && dataAcceptor_1.failureAcceptor === false">
+                    <div v-if="dataAcceptor[0].currentFault === 1">
                         <p>Awaria połączenia</p>
                     </div>
-                    <div v-else-if="dataAcceptor_1.faultType === 1 && dataAcceptor_1.failureAcceptor === false">
+                    <div v-else-if="dataAcceptor[0].currentFault === 2">
                         <p>Szalony acceptor</p>
                     </div>
                     <div v-else>
                         <p>Brak awarii</p>
                     </div>
                 </td>
-                <td>{{dataAcceptor_1.sequenceNumber}}</td>
-                <td>{{dataAcceptor_1.proposerValue}}</td>
-                <td>{{dataAcceptor_1.votingValue}}</td>
+                <td>{{dataAcceptor[0].currentSequenceNumber}}</td>
+                <td>{{dataAcceptor[0].currentProblem}}</td>
+                <td>{{dataAcceptor[0].currentProblemVotes}}</td>
                 <td><select class="form-control" v-model="failureAcceptor_1" placeholder="Rodzaj błedu">
-                    <option value="0">Awaria połączenia</option>
-                    <option value="1">Szalony acceptor</option>
+                    <option value="1">Awaria połączenia</option>
+                    <option value="2">Szalony acceptor</option>
                 </select>
                     <hr>
                     <button @click="addNewFailureToAcceptor_1" type="button" class="btn btn-danger">Aktywuj błąd
@@ -114,10 +114,11 @@
                     </button>
                 </td>
             </tr>
+
             <tr>
-                <th scope="row">2</th>
+                <th scope="row">1</th>
                 <td>
-                    <div v-if="dataAcceptor_2.failureAcceptor === true">
+                    <div v-if="dataAcceptor[1].currentFault === 0">
                         <h2>✔️</h2>
                     </div>
                     <div v-else>
@@ -125,22 +126,22 @@
                     </div>
                 </td>
                 <td>
-                    <div v-if="dataAcceptor_2.faultType === 0 && dataAcceptor_2.failureAcceptor === false">
+                    <div v-if="dataAcceptor[1].currentFault === 1">
                         <p>Awaria połączenia</p>
                     </div>
-                    <div v-else-if="dataAcceptor_2.faultType === 1 && dataAcceptor_2.failureAcceptor === false">
+                    <div v-else-if="dataAcceptor[1].currentFault === 2">
                         <p>Szalony acceptor</p>
                     </div>
                     <div v-else>
                         <p>Brak awarii</p>
                     </div>
                 </td>
-                <td>{{dataAcceptor_2.sequenceNumber}}</td>
-                <td>{{dataAcceptor_2.proposerValue}}</td>
-                <td>{{dataAcceptor_2.votingValue}}</td>
+                <td>{{dataAcceptor[1].currentSequenceNumber}}</td>
+                <td>{{dataAcceptor[1].currentProblem}}</td>
+                <td>{{dataAcceptor[1].currentProblemVotes}}</td>
                 <td><select class="form-control" v-model="failureAcceptor_2" placeholder="Rodzaj błedu">
-                    <option value="0">Awaria połączenia</option>
-                    <option value="1">Szalony acceptor</option>
+                    <option value="1">Awaria połączenia</option>
+                    <option value="2">Szalony acceptor</option>
                 </select>
                     <hr>
                     <button @click="addNewFailureToAcceptor_2" type="button" class="btn btn-danger">Aktywuj błąd
@@ -149,10 +150,11 @@
                     </button>
                 </td>
             </tr>
+
             <tr>
                 <th scope="row">3</th>
                 <td>
-                    <div v-if="dataAcceptor_3.failureAcceptor === true">
+                    <div v-if="dataAcceptor[2].currentFault === 0">
                         <h2>✔️</h2>
                     </div>
                     <div v-else>
@@ -160,22 +162,22 @@
                     </div>
                 </td>
                 <td>
-                    <div v-if="dataAcceptor_3.faultType === 0 && dataAcceptor_3.failureAcceptor === false">
+                    <div v-if="dataAcceptor[2].currentFault === 1">
                         <p>Awaria połączenia</p>
                     </div>
-                    <div v-else-if="dataAcceptor_3.faultType === 1 && dataAcceptor_3.failureAcceptor === false">
+                    <div v-else-if="dataAcceptor[2].currentFault === 2">
                         <p>Szalony acceptor</p>
                     </div>
                     <div v-else>
                         <p>Brak awarii</p>
                     </div>
                 </td>
-                <td>{{dataAcceptor_3.sequenceNumber}}</td>
-                <td>{{dataAcceptor_3.proposerValue}}</td>
-                <td>{{dataAcceptor_3.votingValue}}</td>
-                <td><select class="form-control" v-model="failureAcceptor_3" placeholder="Rodzaj błedu">
-                    <option value="0">Awaria połączenia</option>
-                    <option value="1">Szalony acceptor</option>
+                <td>{{dataAcceptor[2].currentSequenceNumber}}</td>
+                <td>{{dataAcceptor[2].currentProblem}}</td>
+                <td>{{dataAcceptor[2].currentProblemVotes}}</td>
+                <td><select class="form-control" v-model="failureAcceptor_2" placeholder="Rodzaj błedu">
+                    <option value="1">Awaria połączenia</option>
+                    <option value="2">Szalony acceptor</option>
                 </select>
                     <hr>
                     <button @click="addNewFailureToAcceptor_3" type="button" class="btn btn-danger">Aktywuj błąd
@@ -184,6 +186,7 @@
                     </button>
                 </td>
             </tr>
+
             </tbody>
         </table>
     </div>
@@ -195,8 +198,13 @@
                 <div id="addNewValueToProposer">
                     <p>Aktualne głosowanie: {{newValueToProposer}}</p>
                     <div class="col-sm-4 themed-grid-col">
+
+                        <input type="text" class="form-control" v-model="newClientID"
+                               placeholder="Identyfikator klienta">
+                        <hr>
+
                         <input type="text" class="form-control" v-model="newValueToProposer"
-                               placeholder="nowa wartość">
+                               placeholder="Wartość głosowania">
                         <hr>
                         <button @click="updateValue" type="button" class="btn btn-primary">Rozpocznij proces głosowania
                         </button>
@@ -223,7 +231,7 @@
         </div>
     </div>
 -->
-
+<!--
     <br><br><h3>Historia głosowań:</h3><hr>
     <div id="getHistoryVoting">
         <table class="table">
@@ -243,6 +251,7 @@
             </tbody>
         </table>
     </div>
+    -->
 </main>
 
 <footer class="footer">
@@ -257,9 +266,7 @@
         el: '#getInformationAboutAcceptors',
         data:
             {
-                dataAcceptor_1: "",
-                dataAcceptor_2: "",
-                dataAcceptor_3: "",
+                dataAcceptor: "",
                 failureAcceptor_1: "",
                 failureAcceptor_2: "",
                 failureAcceptor_3: ""
@@ -269,15 +276,15 @@
                 if (this.responseStatus === true) {
                     axios({
                         method: 'post',
-                        url: 'http://localhost:2110/acceptor/1/' + this.failureAcceptor_1,
+                        url: 'http://localhost:2110/proposer/enable-acceptor-error?acceptorId=0&errorType=' + this.failureAcceptor_1,
                     })
                 }
             },
             removeFailureFromAcceptor_1() {
                 if (this.responseStatus === true) {
                     axios({
-                        method: 'delete',
-                        url: 'http://localhost:2110/acceptor/1',
+                        method: 'post',
+                        url: 'http://localhost:2110/proposer/disable-acceptor-error?acceptorId=0',
                     })
                 }
             },
@@ -285,15 +292,15 @@
                 if (this.responseStatus === true) {
                     axios({
                         method: 'post',
-                        url: 'http://localhost:2110/acceptor/2/' + this.failureAcceptor_2,
+                        url: 'http://localhost:2110/proposer/enable-acceptor-error?acceptorId=1&errorType=' + this.failureAcceptor_2,
                     })
                 }
             },
             removeFailureFromAcceptor_2() {
                 if (this.responseStatus === true) {
                     axios({
-                        method: 'delete',
-                        url: 'http://localhost:2110/acceptor/2',
+                        method: 'post',
+                        url: 'http://localhost:2110/proposer/disable-acceptor-error?acceptorId=1',
                     })
                 }
             },
@@ -301,15 +308,15 @@
                 if (this.responseStatus === true) {
                     axios({
                         method: 'post',
-                        url: 'http://localhost:2110/acceptor/3/' + this.failureAcceptor_3
+                        url: 'http://localhost:2110/proposer/enable-acceptor-error?acceptorId=2&errorType=' + this.failureAcceptor_3
                     })
                 }
             },
             removeFailureFromAcceptor_3() {
                 if (this.responseStatus === true) {
                     axios({
-                        method: 'delete',
-                        url: 'http://localhost:2110/acceptor/3',
+                        method: 'post',
+                        url: 'http://localhost:2110/proposer/disable-acceptor-error?acceptorId=2',
                     })
                 }
             },
@@ -317,33 +324,21 @@
                 if (this.responseStatus === true) {
                     axios({
                         method: 'get',
-                        url: 'http://localhost:2110/acceptor/1',
+                        url: 'http://localhost:2110/proposer/state-of-acceptors',
                     }).then(response => (
-                            this.dataAcceptor_1 = response.data
+                            this.dataAcceptor = response.data
                         )
                     );
-                    axios({
-                        method: 'get',
-                        url: 'http://localhost:2110/acceptor/2',
-                    }).then(response => (
-                            this.dataAcceptor_2 = response.data
-                        )
-                    );
-                    axios({
-                        method: 'get',
-                        url: 'http://localhost:2110/acceptor/3',
-                    }).then(response => (
-                            this.dataAcceptor_3 = response.data
-                        )
-                    )
                 }
             }
         },
         mounted() {
             this.responseStatus = true;
-            this.polling = setInterval(() => {
-                this.loadData();
-            }, 1000)
+            this.polling = setInterval(() => {this.loadData(); }, 1000);
+            axios({
+                method: 'get',
+                url: 'http://localhost:2110/proposer/initialize-clients',
+            }).then( )
         }
     })
 
@@ -351,17 +346,14 @@
         el: '#addNewValueToProposer',
         data:
             {
-                newValueToProposer: ""
+                newValueToProposer: "",
+                newClientID:""
             },
         methods: {
             updateValue() {
                 axios({
-                    method: 'patch',
-                    url: 'http://localhost:2110/proposers/',
-                    data: {
-                        sequenceNumber: 0,
-                        proposerValue: this.newValueToProposer
-                    },
+                    method: 'post',
+                    url: 'http://localhost:2110/proposer/start-new-voting-problem?problemName='+(this.newValueToProposer)+"&clientId="+this.newClientID
                 })
             }
         }
@@ -388,10 +380,10 @@
             }
         },
         mounted() {
-            this.responseStatus = true;
-            this.polling = setInterval(() => {
-                this.loadData();
-            }, 1000)
+        //    this.responseStatus = true;
+         ///   this.polling = setInterval(() => {
+          //      this.loadData();
+         //   }, 1000)
         }
     })
 </script>
