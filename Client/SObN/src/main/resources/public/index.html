@@ -231,27 +231,29 @@
         </div>
     </div>
 -->
-<!--
+
     <br><br><h3>Historia głosowań:</h3><hr>
     <div id="getHistoryVoting">
+        <button @click="updateValue" type="button" class="btn btn-primary">Pobierz wynik głosowania</button>
+        <hr>
         <table class="table">
             <thead>
             <tr>
-                <th scope="col">Identyfikator akceptora</th>
-                <th scope="col">Rodzaj głosowania</th>
-                <th scope="col">Wartośc głosowania akceptora</th>
+                <th scope="col">Głosowanie</th>
+                <th scope="col">Oddane głosy</th>
+                <th scope="col">Ostateczna wartość</th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="item in historyVoting">
-                <td>{{item.acceptorID}}</td>
-                <td>{{item.votingValue}}</td>
-                <td>{{item.acceptorResponse}}</td>
+                <td>{{item.currentProblem}}</td>
+                <td>{{item.currentProblemVotes}}</td>
+                <td>{{item.finalVoteOfAcceptors}}</td>
             </tr>
             </tbody>
         </table>
     </div>
-    -->
+
 </main>
 
 <footer class="footer">
@@ -371,19 +373,25 @@
                 if (this.responseStatus === true) {
                     axios({
                         method: 'get',
-                        url: 'http://localhost:2110/acceptor/history',
+                        url: 'http://localhost:2110/proposer/vote-history',
                     }).then(response => (
                             this.historyVoting = response.data
                         )
                     )
                 }
+            },
+            updateValue() {
+                axios({
+                    method: 'get',
+                    url: 'http://localhost:2110/proposer/get-single-history',
+                })
             }
         },
         mounted() {
-        //    this.responseStatus = true;
-         ///   this.polling = setInterval(() => {
-          //      this.loadData();
-         //   }, 1000)
+            this.responseStatus = true;
+            this.polling = setInterval(() => {
+                this.loadData();
+            }, 1000)
         }
     })
 </script>

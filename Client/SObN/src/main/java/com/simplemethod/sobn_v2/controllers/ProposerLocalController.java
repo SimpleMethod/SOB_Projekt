@@ -1,10 +1,9 @@
 package com.simplemethod.sobn_v2.controllers;
 
 import com.simplemethod.sobn_v2.model.AcceptorResponseModel;
-import com.simplemethod.sobn_v2.model.AcceptorStateSimplifiedModel;
 import com.simplemethod.sobn_v2.model.ClientModel;
+import com.simplemethod.sobn_v2.model.VoteHistoryModel;
 import com.simplemethod.sobn_v2.services.CommunicationService;
-import com.simplemethod.sobn_v2.services.ProposerAppState;
 import com.simplemethod.sobn_v2.services.ProposerPaxosLogicService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,7 +36,7 @@ public class ProposerLocalController {
     //TODO MM: Always visible and reloaded on UI
     @GetMapping("/state-of-acceptors")
     public List<AcceptorResponseModel> getStateOfAcceptors() {
-        return Stream.of(communicationService.readStateOfAcceptor(0),communicationService.readStateOfAcceptor(1),communicationService.readStateOfAcceptor(2)).collect(Collectors.toList());
+        return Stream.of(communicationService.readStateOfAcceptor(0), communicationService.readStateOfAcceptor(1), communicationService.readStateOfAcceptor(2)).collect(Collectors.toList());
     }
 
     //TODO KP&MaMR: Use once after start of application
@@ -71,4 +69,14 @@ public class ProposerLocalController {
         communicationService.sendDisableErrorRequest(acceptorId);
     }
 
+
+    @GetMapping("/vote-history")
+    public List<VoteHistoryModel> getVoteHistory() {
+        return communicationService.readHistory();
+    }
+
+    @GetMapping("/get-single-history")
+    public void getSingleHistory() {
+        communicationService.readSingleHistory();
+    }
 }
