@@ -83,10 +83,10 @@ public class AcceptorPaxosLogicService {
     public void acceptNewVotingSession(Integer acceptorId, AcceptedNotificationModel accepted) {
         AcceptorModel acceptor = acceptorAppState.getAcceptor(acceptorId);
 
-        if (shouldAcceptMsg(accepted, acceptor)) {
+     //   if (shouldAcceptMsg(accepted, acceptor)) {
             acceptor.getVotingSessions().add(new VotingSession(accepted.getAcceptedValue()));
             acceptor.setCurrentSequenceNumber(accepted.getNewSequenceId());
-        } //TODO: Verify that the error checking is working correctly //MM
+   //     } //TODO: Verify that the error checking is working correctly //MM
     }
 
     public void acceptNewVote(Integer acceptorId, AcceptedNotificationModel accepted) {
